@@ -1,0 +1,11 @@
+enum SystemRole {
+  USER
+  ADMIN
+}
+
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
