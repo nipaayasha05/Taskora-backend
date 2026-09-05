@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { IRegisterUserPayload, IVerifyEmailPayload } from "./auth.interface";
+import {
+  ILoginUserPayload,
+  IRegisterUserPayload,
+  IVerifyEmailPayload,
+} from "./auth.interface";
 import httpStatus from "http-status";
 import config from "../../config";
 import crypto from "crypto";
@@ -190,7 +194,61 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
   };
 };
 
+const loginUser = async (payload: ILoginUserPayload) => {
+  const { password } = payload;
+
+  const email = payload.email.trim().toLowerCase();
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User not found");
+  }
+
+  if (user.status === "BANNED") {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is banned");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(
+    password,
+    user.password as string,
+  );
+
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Password does not match");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    systemRole: user.systemRole,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
+
+  return {
+    user,
+    accessToken,
+    refreshToken,
+  };
+};
+
 export const authService = {
   registerUser,
   verifyUserEmail,
+  loginUser,
 };
