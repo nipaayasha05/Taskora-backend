@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 export default {
   node_env: process.env.NODE_ENV,
   port: process.env.PORT!,
-  app_url: process.env.APP_URL_URL!,
+  app_url: process.env.APP_URL!,
   databaseUrl: process.env.DATABASE_URL!,
   jwt_access_secret: process.env.JWT_ACCESS_SECRET!,
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET!,
@@ -22,4 +22,5 @@ export default {
   smtp_password: process.env.SMTP_PASSWORD!,
   smtp_user: process.env.SMTP_USER!,
   email_sender: process.env.EMAIL_SENDER!,
+  google_client_id: process.env.GOOGLE_CLIENT_ID!,
 };

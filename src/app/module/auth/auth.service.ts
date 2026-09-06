@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import {
+  IGoogleLoginPayload,
   ILoginUserPayload,
   IRegisterUserPayload,
   IVerifyEmailPayload,
@@ -15,6 +16,14 @@ import ejs from "ejs";
 import { transporter } from "../../lib/nodemailer";
 import { jwtUtils } from "../../utils/jwt";
 import { SignOptions } from "jsonwebtoken";
+import { TokenPayload } from "google-auth-library";
+import { googleClient } from "../../lib/googleAuth";
+import {
+  AuthProvider,
+  SystemRole,
+  UserStatus,
+} from "../../../../prisma/generated/prisma/enums";
+import { is } from "zod/locales";
 
 const registerUser = async (payload: IRegisterUserPayload) => {
   const { name, password, phone } = payload;
@@ -99,8 +108,8 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
     },
   });
 
-  if (isUserExists?.email) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Email already exists");
+  if (isUserExists?.emailVerified) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Email already verified");
   }
 
   if (isUserExists?.status === "BANNED") {
@@ -141,6 +150,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
       phone: userPayload.phone,
       status: "ACTIVE",
       systemRole: "USER",
+      emailVerified: true,
     },
     omit: {
       password: true,
@@ -247,8 +257,150 @@ const loginUser = async (payload: ILoginUserPayload) => {
   };
 };
 
+const googleLogin = async (payload: IGoogleLoginPayload) => {
+  let googleIdTokenPayload: TokenPayload | null | undefined = null;
+
+  console.log({ payload });
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: payload.idToken,
+      audience: config.google_client_id,
+    });
+
+    googleIdTokenPayload = ticket.getPayload();
+  } catch (error) {
+    console.log(error, "google id token failed");
+    throw new AppError(httpStatus.BAD_REQUEST, "Google id token failed");
+  }
+
+  if (!googleIdTokenPayload) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Google ID token payload not found",
+    );
+  }
+
+  if (!googleIdTokenPayload.email) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Google ID token payload email not found",
+    );
+  }
+
+  if (!googleIdTokenPayload.name) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Google ID token payload name not found",
+    );
+  }
+
+  if (!googleIdTokenPayload?.email_verified) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Google ID token payload email not verified",
+    );
+  }
+
+  const isUserExistsWithGoogleAuth = await prisma.user.findUnique({
+    where: {
+      email: googleIdTokenPayload.email,
+      systemRole: SystemRole.USER,
+      googleId: googleIdTokenPayload.sub,
+    },
+  });
+
+  let user = isUserExistsWithGoogleAuth;
+
+  if (!isUserExistsWithGoogleAuth) {
+    const ifUserExistsWithCredentials = await prisma.user.findUnique({
+      where: {
+        email: googleIdTokenPayload.email,
+        systemRole: SystemRole.USER,
+        authProvider: AuthProvider.CREDENTIAL,
+      },
+    });
+
+    if (ifUserExistsWithCredentials) {
+      if (ifUserExistsWithCredentials.status === UserStatus.BANNED) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User is banned");
+      }
+
+      user = await prisma.user.update({
+        where: {
+          id: ifUserExistsWithCredentials.id,
+        },
+        data: {
+          googleId: googleIdTokenPayload.sub,
+        },
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          name: googleIdTokenPayload.name,
+          email: googleIdTokenPayload.email,
+          systemRole: SystemRole.USER,
+          googleId: googleIdTokenPayload.sub,
+          authProvider: AuthProvider.GOOGLE,
+          emailVerified: true,
+        },
+      });
+
+      const templatePath = path.join(
+        process.cwd(),
+        "src/app/templates/welcome-email.ejs",
+      );
+
+      const templateData = {
+        name: user.name,
+      };
+
+      const html = await ejs.renderFile(templatePath, templateData);
+
+      await transporter.sendMail({
+        from: config.email_sender,
+        to: user.email,
+        subject: "Welcome to Taskora",
+        html,
+      });
+    }
+  }
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User not found");
+  }
+
+  if (user.status === UserStatus.BANNED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is banned");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    systemRole: user.systemRole,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
 export const authService = {
   registerUser,
   verifyUserEmail,
   loginUser,
+  googleLogin,
 };

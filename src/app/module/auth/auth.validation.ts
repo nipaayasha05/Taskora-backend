@@ -38,8 +38,13 @@ const loginZodSchema = z.object({
     ),
 });
 
+const googleLoginZodSchema = z.object({
+  idToken: z.string("idToken is required"),
+});
+
 export const userValidation = {
   userRegistrationZodSchema,
   PatientEmailVerifyZodSchema,
   loginZodSchema,
+  googleLoginZodSchema,
 };

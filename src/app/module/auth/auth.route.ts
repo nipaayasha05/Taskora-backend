@@ -23,4 +23,10 @@ router.post(
   authController.loginUser,
 );
 
+router.post(
+  "/google",
+  // validateRequest(userValidation.googleLoginZodSchema),
+  authController.googleLogin,
+);
+
 export const authRoutes = router;
