@@ -25,8 +25,10 @@ router.post(
 
 router.post(
   "/google",
-  // validateRequest(userValidation.googleLoginZodSchema),
+  validateRequest(userValidation.googleLoginZodSchema),
   authController.googleLogin,
 );
+
+router.post("/refresh-token", authController.refreshToken);
 
 export const authRoutes = router;

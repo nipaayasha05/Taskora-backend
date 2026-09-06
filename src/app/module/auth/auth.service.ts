@@ -15,7 +15,7 @@ import path from "path";
 import ejs from "ejs";
 import { transporter } from "../../lib/nodemailer";
 import { jwtUtils } from "../../utils/jwt";
-import { SignOptions } from "jsonwebtoken";
+import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { TokenPayload } from "google-auth-library";
 import { googleClient } from "../../lib/googleAuth";
 import {
@@ -398,9 +398,61 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
   };
 };
 
+const refreshToken = async (token: string) => {
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    token,
+    config.jwt_refresh_secret,
+  );
+
+  if (!verifiedRefreshToken.success || !verifiedRefreshToken.data) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      config.node_env === "development"
+        ? verifiedRefreshToken.error
+        : "Refresh token is invalid",
+    );
+  }
+
+  const data = verifiedRefreshToken.data as JwtPayload;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: data.userId,
+    },
+  });
+
+  if (!user || user.status !== UserStatus.ACTIVE) {
+    throw new AppError(httpStatus.BAD_REQUEST, "User is not active");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    systemRole: user.systemRole,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
 export const authService = {
   registerUser,
   verifyUserEmail,
   loginUser,
   googleLogin,
+  refreshToken,
 };
