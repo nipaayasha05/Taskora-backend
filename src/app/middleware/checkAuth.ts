@@ -40,7 +40,13 @@ export const auth = (...requiredRoles: SystemRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized access");
     }
 
-    const { email, id, systemRole } = verifiedToken.data as JwtPayload;
+    const { email, userId, systemRole } = verifiedToken.data as JwtPayload;
+
+    console.log({
+      email,
+      userId,
+      systemRole,
+    });
 
     if (requiredRoles.length && !requiredRoles.includes(systemRole)) {
       throw new AppError(
@@ -51,7 +57,7 @@ export const auth = (...requiredRoles: SystemRole[]) => {
 
     const user = await prisma.user.findUnique({
       where: {
-        id,
+        id: userId,
         email,
         systemRole,
       },
@@ -70,7 +76,7 @@ export const auth = (...requiredRoles: SystemRole[]) => {
 
     req.user = {
       email,
-      userId: id,
+      userId,
       systemRole,
     };
     next();

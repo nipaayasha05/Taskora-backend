@@ -26,7 +26,7 @@ import {
 import { is } from "zod/locales";
 
 const registerUser = async (payload: IRegisterUserPayload) => {
-  const { name, password, phone } = payload;
+  const { name, password } = payload;
 
   const email = payload.email.trim().toLowerCase();
 
@@ -59,7 +59,6 @@ const registerUser = async (payload: IRegisterUserPayload) => {
     name,
     email,
     password: hashedPassword,
-    phone,
   };
 
   const userRegistrationKey = `user-registration-data : ${email}`;
@@ -147,9 +146,8 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
       name: userPayload.name,
       email: userPayload.email,
       password: userPayload.password,
-      phone: userPayload.phone,
-      status: "ACTIVE",
-      systemRole: "USER",
+      status: UserStatus.ACTIVE,
+      systemRole: SystemRole.USER,
       emailVerified: true,
     },
     omit: {

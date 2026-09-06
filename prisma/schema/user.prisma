@@ -4,11 +4,14 @@ model User {
   email         String       @unique
   password      String?
   googleId      String?      @unique
-  phone         String?
   systemRole    SystemRole   @default(USER)
   status        UserStatus   @default(ACTIVE)
   authProvider  AuthProvider @default(CREDENTIAL)
   emailVerified Boolean      @default(false)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+
+  profile Profile?
+
+  @@map("users")
 }

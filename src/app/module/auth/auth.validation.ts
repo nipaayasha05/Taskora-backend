@@ -16,7 +16,6 @@ const userRegistrationZodSchema = z.object({
       /[!@#$%^&*(),.?":{}|<>]/,
       "password must contain at least one special character",
     ),
-  phone: z.string("contactNumber is required"),
 });
 
 const PatientEmailVerifyZodSchema = z.object({
