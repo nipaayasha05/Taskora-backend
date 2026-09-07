@@ -1,0 +1,19 @@
+model Organization {
+  id String @id @default(uuid())
+
+  name        String
+  description String
+  industry    String
+  logo        String?
+  status      OrganizationStatus @default(PENDING)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  members OrganizationMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizations")
+}

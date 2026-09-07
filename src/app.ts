@@ -9,6 +9,7 @@ import { authRoutes } from "./app/module/auth/auth.route";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { profileRoutes } from "./app/module/profile/profile.route";
+import { organizationRoutes } from "./app/module/organization/organization.route";
 
 const app: Application = express();
 
@@ -25,6 +26,7 @@ app.use(
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", profileRoutes);
+app.use("/api/v1/organizations", organizationRoutes);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({

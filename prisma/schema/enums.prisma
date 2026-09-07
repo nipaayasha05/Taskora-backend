@@ -13,3 +13,16 @@ enum AuthProvider {
   GOOGLE
   CREDENTIAL
 }
+
+enum OrganizationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DELETED
+}
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  TEAM_MEMBER
+}

@@ -45,6 +45,7 @@ const registerUser = async (payload: IRegisterUserPayload) => {
   const otpValue = crypto.randomInt(100000, 999999).toString();
 
   const otpKey = `user-registration-otp-${email}`;
+  console.log({ otpKey });
 
   const expirationSeconds = 5 * 60;
 
@@ -61,7 +62,7 @@ const registerUser = async (payload: IRegisterUserPayload) => {
     password: hashedPassword,
   };
 
-  const userRegistrationKey = `user-registration-data : ${email}`;
+  const userRegistrationKey = `user-registration-data:${email}`;
 
   await redisClient.set(
     userRegistrationKey,
@@ -117,6 +118,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
 
   const otpKey = `user-registration-otp-${email}`;
   const redisOtp = await redisClient.get(otpKey);
+  console.log({ redisOtp, otpKey });
 
   if (!redisOtp) {
     throw new AppError(httpStatus.BAD_REQUEST, "OTP not found");
@@ -128,7 +130,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
 
   await redisClient.del(otpKey);
 
-  const userRagistrationKey = `user-registration-data : ${email}`;
+  const userRagistrationKey = `user-registration-data:${email}`;
 
   const redisUserData = await redisClient.get(userRagistrationKey);
 
