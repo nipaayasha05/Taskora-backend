@@ -19,4 +19,16 @@ router.patch(
   organizationController.updateOrganization,
 );
 
+router.post(
+  "/:organizationId/join",
+  auth(),
+  organizationController.joinOrganizationCreate,
+);
+
+router.patch(
+  "/:organizationId/join",
+  auth(),
+  organizationController.updateJoinOrganization,
+);
+
 export const organizationRoutes = router;

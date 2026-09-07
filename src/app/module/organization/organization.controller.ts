@@ -47,7 +47,55 @@ const updateOrganization = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const joinOrganizationCreate = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const organizationId = req.params.organizationId;
+
+    const payload = req.body;
+
+    const result = await organizationService.joinOrganizationCreate(
+      user as RequestUser,
+      organizationId as string,
+      payload,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization joined successfully",
+      data: result,
+    });
+  },
+);
+
+const updateJoinOrganization = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const organizationId = req.params.organizationId;
+
+    const payload = req.body;
+
+    const result = await organizationService.updateJoinOrganization(
+      user as RequestUser,
+      organizationId as string,
+      payload,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization updated successfully",
+      data: result,
+    });
+  },
+);
+
 export const organizationController = {
   createOrganization,
   updateOrganization,
+  joinOrganizationCreate,
+  updateJoinOrganization,
 };

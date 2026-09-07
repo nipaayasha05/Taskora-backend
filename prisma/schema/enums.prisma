@@ -24,5 +24,12 @@ enum OrganizationStatus {
 enum OrganizationRole {
   OWNER
   ADMIN
+  MANAGER
   TEAM_MEMBER
+}
+
+enum OrganizationJoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

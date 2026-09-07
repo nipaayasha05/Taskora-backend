@@ -2,13 +2,19 @@ import { UploadApiResponse } from "cloudinary";
 import { cloudinary } from "../../lib/cloudinary";
 import {
   IOrganizationCreate,
+  IOrganizationJoin,
+  IOrganizationJoinUpdate,
   IOrganizationUpdate,
 } from "./organization.interface";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
-import { OrganizationStatus } from "../../../../prisma/generated/prisma/enums";
+import {
+  OrganizationJoinRequestStatus,
+  OrganizationRole,
+  OrganizationStatus,
+} from "../../../../prisma/generated/prisma/enums";
 
 const createOrganization = async (
   user: RequestUser,
@@ -104,7 +110,145 @@ const updateOrganization = async (
   return result;
 };
 
+const joinOrganizationCreate = async (
+  user: RequestUser,
+  organizationId: string,
+  payload: IOrganizationJoin,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (
+    member?.role !== OrganizationRole.OWNER &&
+    member?.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Only users with role OWNER or MANAGER can request to join organizations",
+    );
+  }
+
+  const existingRequest = await prisma.organizationJoinRequest.findFirst({
+    where: {
+      organizationId,
+      invitedToId: payload.invitedToId,
+      status: OrganizationJoinRequestStatus.PENDING,
+    },
+  });
+
+  if (existingRequest) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User already have a pending request to join the organization",
+    );
+  }
+
+  const joinRequst = await prisma.organizationJoinRequest.create({
+    data: {
+      organizationId,
+      invitedToId: payload.invitedToId,
+      invitedById: user.userId,
+    },
+  });
+  return joinRequst;
+};
+
+const updateJoinOrganization = async (
+  user: RequestUser,
+  organizationId: string,
+  payload: IOrganizationJoinUpdate,
+) => {
+  const { invitedToId, status } = payload;
+
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  if (invitedToId !== user.userId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You can only respond to your own invitation",
+    );
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const joinRequest = await tx.organizationJoinRequest.findFirst({
+      where: {
+        organizationId,
+        invitedToId,
+        status: OrganizationJoinRequestStatus.PENDING,
+      },
+    });
+
+    if (!joinRequest) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Organization join request not found",
+      );
+    }
+
+    const updatedOrganizationJoinRequest =
+      await tx.organizationJoinRequest.update({
+        where: {
+          id: joinRequest.id,
+        },
+        data: {
+          status,
+        },
+      });
+
+    if (!updatedOrganizationJoinRequest) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Organization join request not found",
+      );
+    }
+
+    if (status === OrganizationJoinRequestStatus.APPROVED) {
+      const existingMember = await prisma.organizationMember.findUnique({
+        where: {
+          organizationId_userId: {
+            organizationId,
+            userId: user.userId,
+          },
+        },
+      });
+
+      if (existingMember) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "User already have a member of the organization",
+        );
+      }
+
+      await tx.organizationMember.create({
+        data: {
+          organizationId,
+          userId: user.userId,
+          role: joinRequest.role,
+        },
+      });
+    }
+
+    return updatedOrganizationJoinRequest;
+  });
+
+  return result;
+};
+
 export const organizationService = {
   createOrganization,
   updateOrganization,
+  joinOrganizationCreate,
+  updateJoinOrganization,
 };
