@@ -93,9 +93,34 @@ const updateJoinOrganization = catchAsync(
   },
 );
 
+const updateOrganizationMember = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const organizationId = req.params.organizationId;
+
+    const payload = req.body;
+
+    const result = await organizationService.updateOrganizationMember(
+      user as RequestUser,
+      organizationId as string,
+      req.params?.memberId as string,
+      payload,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization member updated successfully",
+      data: result,
+    });
+  },
+);
+
 export const organizationController = {
   createOrganization,
   updateOrganization,
   joinOrganizationCreate,
   updateJoinOrganization,
+  updateOrganizationMember,
 };

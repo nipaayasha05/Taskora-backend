@@ -15,7 +15,6 @@ model OrganizationJoinRequest {
   status    OrganizationJoinRequestStatus @default(PENDING)
   createdAt DateTime                      @default(now())
   updatedAt DateTime                      @updatedAt
-  
 
   @@index([organizationId, invitedToId])
   @@map("organization_join_request")

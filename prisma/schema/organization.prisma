@@ -17,5 +17,7 @@ model Organization {
 
   organizationJoinRequests OrganizationJoinRequest[]
 
+  teams Team[]
+
   @@map("organizations")
 }

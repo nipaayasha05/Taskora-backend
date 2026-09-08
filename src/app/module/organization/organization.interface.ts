@@ -22,3 +22,9 @@ export interface IOrganizationJoinUpdate {
   invitedToId: string;
   status: "APPROVED" | "REJECTED";
 }
+
+export interface IOrganizationMemberUpdate {
+  organizationId: string;
+  memberId: string;
+  role: "TEAM_MEMBER" | "MANAGER";
+}

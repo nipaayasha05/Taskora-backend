@@ -18,3 +18,25 @@ export const createOrganizationSchema = z.object({
 
   logo: z.string().url("Logo must be a valid URL").optional().nullable(),
 });
+
+export const organizationJoinSchema = z.object({
+  invitedToId: z.string().uuid("Invalid invitedToId"),
+
+  invitedById: z.string().uuid("Invalid invitedById"),
+});
+
+export const organizationJoinUpdateSchema = z.object({
+  organizationId: z.string().uuid("Invalid organizationId"),
+
+  invitedToId: z.string().uuid("Invalid invitedToId"),
+
+  status: z.enum(["APPROVED", "REJECTED"]),
+});
+
+export const organizationMemberUpdateSchema = z.object({
+  // organizationId: z.string().uuid("Invalid organizationId"),
+
+  // memberId: z.string().uuid("Invalid memberId"),
+
+  role: z.enum(["TEAM_MEMBER", "MANAGER"]),
+});

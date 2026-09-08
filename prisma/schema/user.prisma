@@ -11,12 +11,14 @@ model User {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
-  profile                  Profile?
-  createdOrganizations     Organization[]
-  organizationMembers      OrganizationMember[]
-  
-  invitedBy                OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedByUser")
-  invitedTo                OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedToUser")
+  profile              Profile?
+  createdOrganizations Organization[]
+  organizationMembers  OrganizationMember[]
+
+  invitedBy OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedByUser")
+  invitedTo OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedToUser")
+
+  cretedBy Team[]
 
   @@map("users")
 }

@@ -4,6 +4,7 @@ import {
   IOrganizationCreate,
   IOrganizationJoin,
   IOrganizationJoinUpdate,
+  IOrganizationMemberUpdate,
   IOrganizationUpdate,
 } from "./organization.interface";
 import { prisma } from "../../lib/prisma";
@@ -138,6 +139,22 @@ const joinOrganizationCreate = async (
     );
   }
 
+  const existingMember = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: payload.invitedToId,
+      },
+    },
+  });
+
+  if (existingMember) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User already a member of the organization",
+    );
+  }
+
   const existingRequest = await prisma.organizationJoinRequest.findFirst({
     where: {
       organizationId,
@@ -149,7 +166,7 @@ const joinOrganizationCreate = async (
   if (existingRequest) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "User already have a pending request to join the organization",
+      "User already has a pending invitation to this organization",
     );
   }
 
@@ -246,9 +263,73 @@ const updateJoinOrganization = async (
   return result;
 };
 
+const updateOrganizationMember = async (
+  user: RequestUser,
+  organizationId: string,
+  memberId: string,
+  payload: IOrganizationMemberUpdate,
+) => {
+  const { role } = payload;
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const currentMember = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (!currentMember) {
+    throw new AppError(httpStatus.NOT_FOUND, "Organization member not found");
+  }
+
+  if (currentMember.role !== OrganizationRole.OWNER) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Only OWNER can update member role",
+    );
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      id: memberId,
+    },
+  });
+
+  if (!member) {
+    throw new AppError(httpStatus.NOT_FOUND, "Organization member not found");
+  }
+
+  if (member?.role === OrganizationRole.OWNER) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Owner cannot be updated");
+  }
+
+  if (member.organizationId !== organizationId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Member not part of the organization",
+    );
+  }
+
+  const result = await prisma.organizationMember.update({
+    where: {
+      id: memberId,
+    },
+    data: {
+      role,
+    },
+  });
+  return result;
+};
+
 export const organizationService = {
   createOrganization,
   updateOrganization,
   joinOrganizationCreate,
   updateJoinOrganization,
+  updateOrganizationMember,
 };
