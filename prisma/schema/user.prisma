@@ -18,7 +18,8 @@ model User {
   invitedBy OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedByUser")
   invitedTo OrganizationJoinRequest[] @relation("OrganizationJoinRequestInvitedToUser")
 
-  cretedBy Team[]
+  cretedBy    Team[]
+  teamMembers TeamMember[]
 
   @@map("users")
 }

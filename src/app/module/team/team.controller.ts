@@ -21,6 +21,31 @@ const createTeam = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createTeamMember = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const payload = req.body;
+
+  const organizationId = req.params.organizationId as string;
+
+  const teamId = req.params.teamId as string;
+
+  const result = await teamService.createTeamMember(
+    user,
+    payload,
+    organizationId,
+    teamId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Team member created successfully",
+    data: result,
+  });
+});
+
 export const teamController = {
   createTeam,
+  createTeamMember,
 };

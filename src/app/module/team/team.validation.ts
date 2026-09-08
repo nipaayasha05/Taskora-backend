@@ -13,3 +13,7 @@ export const teamCreateSchema = z.object({
     .max(500, "Description cannot exceed 500 characters")
     .optional(),
 });
+
+export const teamMemberCreateSchema = z.object({
+  userIds: z.array(z.string().uuid("Invalid userId")),
+});

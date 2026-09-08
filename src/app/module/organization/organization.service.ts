@@ -100,7 +100,7 @@ const updateOrganization = async (
       await tx.organizationMember.create({
         data: {
           organizationId: updatedOrganization.id,
-          userId: reviewer.userId,
+          userId: organization.createdById,
           role: "OWNER",
         },
       });
