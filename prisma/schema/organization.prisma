@@ -19,5 +19,7 @@ model Organization {
 
   teams Team[]
 
+  projects Project[]
+
   @@map("organizations")
 }

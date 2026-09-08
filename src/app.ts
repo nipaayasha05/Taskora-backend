@@ -11,6 +11,7 @@ import { notFound } from "./app/middleware/notFound";
 import { profileRoutes } from "./app/module/profile/profile.route";
 import { organizationRoutes } from "./app/module/organization/organization.route";
 import { teamRoutes } from "./app/module/team/team.route";
+import { projectRoutes } from "./app/module/project/project.route";
 
 const app: Application = express();
 
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", profileRoutes);
 app.use("/api/v1/organizations", organizationRoutes);
 app.use("/api/v1/organization/teams", teamRoutes);
+app.use("/api/v1/organization/projects", projectRoutes);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({

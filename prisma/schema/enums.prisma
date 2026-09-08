@@ -33,3 +33,10 @@ enum OrganizationJoinRequestStatus {
   APPROVED
   REJECTED
 }
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
