@@ -12,6 +12,8 @@ model SprintTeam {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tasks Task[]
+
   @@unique([sprintId, teamId])
   @@map("sprint_teams")
 }

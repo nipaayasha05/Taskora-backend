@@ -13,13 +13,15 @@ model Task {
   status   TaskStatus   @default(TODO)
   priority TaskPriority @default(MEDIUM)
 
-  teamId String
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  sprintTeamId String
+  sprintTeam   SprintTeam @relation(fields: [sprintTeamId], references: [id], onDelete: Restrict)
 
   createdById String
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
 
   dueDate DateTime?
+
+  subTasks SubTask[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -60,3 +60,17 @@ enum SprintStatus {
   COMPLETED
   CANCELLED
 }
+
+enum SubTaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SubTaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}

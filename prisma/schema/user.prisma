@@ -27,5 +27,8 @@ model User {
   createdSprints     Sprint[]
   createdSprintTeams SprintTeam[]
 
+  createdSubTasks SubTask[] @relation("SubTaskCreator")
+  assignedTo      SubTask[] @relation("SubTaskAssignee")
+
   @@map("users")
 }

@@ -156,19 +156,6 @@ const updateSprint = async (
     );
   }
 
-  // const existingSprint = await prisma.sprint.findFirst({
-  //   where: {
-
-  //       id: sprintId,
-  //       projectId,
-
-  //   },
-  // });
-
-  // if (!existingSprint) {
-  //   throw new AppError(httpStatus.NOT_FOUND, "Sprint not found");
-  // }
-
   const startDate = payload.startDate
     ? new Date(payload.startDate)
     : sprint.startDate;

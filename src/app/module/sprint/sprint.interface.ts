@@ -5,7 +5,7 @@ export interface ISprintCreate {
   goal?: string;
   startDate: string;
   endDate: string;
-  //   status?: SprintStatus;
+  status?: SprintStatus;
   paymentAmount: number;
 }
 

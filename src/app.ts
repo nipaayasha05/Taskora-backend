@@ -13,6 +13,7 @@ import { organizationRoutes } from "./app/module/organization/organization.route
 import { teamRoutes } from "./app/module/team/team.route";
 import { projectRoutes } from "./app/module/project/project.route";
 import { sprintRoutes } from "./app/module/sprint/sprint.route";
+import { taskRoutes } from "./app/module/task/task.route";
 
 const app: Application = express();
 
@@ -33,7 +34,7 @@ app.use("/api/v1/organizations", organizationRoutes);
 app.use("/api/v1/organization/teams", teamRoutes);
 app.use("/api/v1/organization/projects", projectRoutes);
 app.use("/api/v1/organization/projects/sprints", sprintRoutes);
-// app.use("/api/v1/organization/projects/sprints/tasks", taskRoutes);
+app.use("/api/v1/organization/projects/sprints/tasks", taskRoutes);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({
