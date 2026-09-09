@@ -5,6 +5,7 @@ import { validateRequest } from "../../middleware/validateRequest";
 import {
   sprintCreateSchema,
   sprintTeamCreateSchema,
+  sprintUpdateSchema,
 } from "./sprint.validation";
 
 const router = Router();
@@ -14,6 +15,13 @@ router.post(
   auth(),
   validateRequest(sprintCreateSchema),
   sprintController.createSprint,
+);
+
+router.patch(
+  "/:organizationId/:projectId/:sprintId",
+  auth(),
+  validateRequest(sprintUpdateSchema),
+  sprintController.updateSprint,
 );
 
 router.post(

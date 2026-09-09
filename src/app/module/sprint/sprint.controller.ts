@@ -27,6 +27,30 @@ const createSprint = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateSprint = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const payload = req.body;
+  const sprintId = req.params.sprintId as string;
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+
+  const result = await sprintService.updateSprint(
+    user,
+    payload,
+    organizationId,
+    projectId,
+    sprintId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Sprint updated successfully",
+    data: result,
+  });
+});
+
 const createSprintTeam = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
@@ -56,4 +80,5 @@ const createSprintTeam = catchAsync(async (req: Request, res: Response) => {
 export const sprintController = {
   createSprint,
   createSprintTeam,
+  updateSprint,
 };

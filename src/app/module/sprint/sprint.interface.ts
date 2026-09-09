@@ -9,6 +9,15 @@ export interface ISprintCreate {
   paymentAmount: number;
 }
 
+export interface ISprintUpdate {
+  name?: string;
+  goal?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: SprintStatus;
+  paymentAmount?: number;
+}
+
 export interface ISprintTeamCreate {
   teamIds: string[];
 }

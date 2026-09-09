@@ -1,8 +1,15 @@
-import { OrganizationRole } from "../../../../prisma/generated/prisma/enums";
+import {
+  OrganizationRole,
+  SprintStatus,
+} from "../../../../prisma/generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
-import { ISprintCreate, ISprintTeamCreate } from "./sprint.interface";
+import {
+  ISprintCreate,
+  ISprintTeamCreate,
+  ISprintUpdate,
+} from "./sprint.interface";
 import httpStatus from "http-status";
 
 const createSprint = async (
@@ -82,6 +89,108 @@ const createSprint = async (
   });
 
   return sprint;
+};
+
+const updateSprint = async (
+  user: RequestUser,
+  payload: ISprintUpdate,
+  organizationId: string,
+  projectId: string,
+  sprintId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only organization owner or manager can update a sprint",
+    );
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  const sprint = await prisma.sprint.findFirst({
+    where: {
+      id: sprintId,
+      projectId,
+    },
+  });
+
+  if (!sprint) {
+    throw new AppError(httpStatus.NOT_FOUND, "Sprint not found");
+  }
+
+  if (sprint.status === SprintStatus.COMPLETED) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Sprint is completed. You can not update it",
+    );
+  }
+
+  // const existingSprint = await prisma.sprint.findFirst({
+  //   where: {
+
+  //       id: sprintId,
+  //       projectId,
+
+  //   },
+  // });
+
+  // if (!existingSprint) {
+  //   throw new AppError(httpStatus.NOT_FOUND, "Sprint not found");
+  // }
+
+  const startDate = payload.startDate
+    ? new Date(payload.startDate)
+    : sprint.startDate;
+
+  const endDate = payload.endDate ? new Date(payload.endDate) : sprint.endDate;
+
+  if (startDate >= endDate) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Start date must be before end date",
+    );
+  }
+
+  const result = await prisma.sprint.update({
+    where: {
+      id: sprint.id,
+    },
+    data: {
+      ...payload,
+    },
+  });
+  return result;
 };
 
 const createSprintTeam = async (
@@ -194,5 +303,6 @@ const createSprintTeam = async (
 
 export const sprintService = {
   createSprint,
+  updateSprint,
   createSprintTeam,
 };
