@@ -23,7 +23,9 @@ model User {
 
   createdBy Project[]
 
-  createdById Task[]
+  createdById        Task[]
+  createdSprints     Sprint[]
+  createdSprintTeams SprintTeam[]
 
   @@map("users")
 }
