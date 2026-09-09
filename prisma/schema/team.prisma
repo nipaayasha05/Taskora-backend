@@ -13,6 +13,8 @@ model Team {
 
   members      TeamMember[]
   projectTeams ProjectTeam[]
+  sprintTeams  SprintTeam[]
+  tasks        Task[]
 
   @@unique([name, organizationId])
   @@map("teams")

@@ -23,5 +23,7 @@ model User {
 
   createdBy Project[]
 
+  createdById Task[]
+
   @@map("users")
 }
