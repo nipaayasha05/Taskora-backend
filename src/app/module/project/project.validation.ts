@@ -5,11 +5,12 @@ export const projectCreateSchema = z.object({
 
   description: z.string().optional(),
 
-  //   status: z.enum(["ACTIVE", "COMPLETED", "ON_HOLD", "CANCELLED"]).optional(),
+  status: z.enum(["ACTIVE", "COMPLETED", "ON_HOLD", "CANCELLED"]).optional(),
 
   startDate: z.coerce.date().optional(),
 
   dueDate: z.coerce.date().optional(),
+  clientId: z.string().uuid("Invalid clientId"),
 });
 
 export const projectTeamCreateSchema = z.object({

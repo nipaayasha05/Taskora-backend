@@ -24,4 +24,6 @@ router.post(
   projectController.createProjectTeams,
 );
 
+router.get("/:organizationId/:projectId", auth(), projectController.getProject);
+
 export const projectRoutes = router;

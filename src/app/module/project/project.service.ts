@@ -61,6 +61,20 @@ const createProject = async (
     }
   }
 
+  if (!payload.clientId) {
+    throw new AppError(httpStatus.NOT_FOUND, "Client Id is required");
+  }
+
+  const client = await prisma.user.findUnique({
+    where: {
+      id: payload.clientId,
+    },
+  });
+
+  if (!client) {
+    throw new AppError(httpStatus.NOT_FOUND, "Client not found");
+  }
+
   const project = await prisma.project.create({
     data: {
       ...payload,
@@ -154,7 +168,52 @@ const createProjectTeams = async (
   return result;
 };
 
+const getProject = async (
+  user: RequestUser,
+  projectId: string,
+  organizationId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const result = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+      clientId: user.userId,
+    },
+    include: {
+      client: true,
+      projectTeams: {
+        include: {
+          team: true,
+        },
+      },
+      sprints: {
+        include: {
+          sprintTeams: {
+            include: {
+              team: true,
+            },
+          },
+        },
+      },
+      tasks: {
+        include: {
+          subTasks: true,
+        },
+      },
+    },
+  });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+  return result;
+};
+
 export const projectService = {
   createProject,
   createProjectTeams,
+  getProject,
 };

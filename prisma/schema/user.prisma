@@ -21,7 +21,7 @@ model User {
   cretedBy    Team[]
   teamMembers TeamMember[]
 
-  createdBy Project[]
+  createdProjects Project[] @relation("ProjectCreatedBy")
 
   createdById        Task[]
   createdSprints     Sprint[]
@@ -29,6 +29,7 @@ model User {
 
   createdSubTasks SubTask[] @relation("SubTaskCreator")
   assignedTo      SubTask[] @relation("SubTaskAssignee")
+  clientProjects  Project[] @relation("ProjectClient")
 
   @@map("users")
 }

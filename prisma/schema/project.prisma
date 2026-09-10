@@ -11,7 +11,10 @@ model Project {
   dueDate     DateTime?
 
   createdById String
-  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy   User   @relation("ProjectCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  clientId String?
+  client   User?   @relation("ProjectClient", fields: [clientId], references: [id], onDelete: Cascade)
 
   projectTeams ProjectTeam[]
   sprints      Sprint[]
