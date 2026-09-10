@@ -15,19 +15,25 @@ import { projectRoutes } from "./app/module/project/project.route";
 import { sprintRoutes } from "./app/module/sprint/sprint.route";
 import { taskRoutes } from "./app/module/task/task.route";
 import { subTaskRoutes } from "./app/module/subTask/subTask.route";
+import { paymentRoutes } from "./app/module/payment/payment.route";
 
 const app: Application = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(helmet());
 app.use(
   cors({
     origin: config.app_url,
     credentials: true,
   }),
 );
+
+const endpointSecret = config.stripe_webhook_secret;
+
+app.use("/api/v1/payments/confirm", express.raw({ type: "application/json" }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(helmet());
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", profileRoutes);
@@ -37,6 +43,8 @@ app.use("/api/v1/organization/projects", projectRoutes);
 app.use("/api/v1/organization/projects/sprints", sprintRoutes);
 app.use("/api/v1/organization/projects/sprints/tasks", taskRoutes);
 app.use("/api/v1/organization/projects/sprints/tasks/subtasks", subTaskRoutes);
+
+app.use("/api/v1/payments", paymentRoutes);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({

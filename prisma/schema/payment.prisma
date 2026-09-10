@@ -1,0 +1,23 @@
+model Payment {
+  id String @id @default(uuid())
+
+  sprintId String @unique
+  sprint   Sprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  amount           Decimal @db.Decimal(12, 2)
+  stripeCustomerId String?
+
+  transactionId String?
+
+  paidAt DateTime?
+
+  status PaymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
+}

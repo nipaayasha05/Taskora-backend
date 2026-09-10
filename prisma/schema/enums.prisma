@@ -74,3 +74,9 @@ enum SubTaskPriority {
   HIGH
   URGENT
 }
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
