@@ -1,0 +1,20 @@
+model Attachment {
+  id String @id @default(uuid())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  fileName String
+  fileUrl  String
+  publicId String
+  fileType String
+  fileSize Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("attachments")
+}

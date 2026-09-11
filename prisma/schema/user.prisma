@@ -33,5 +33,8 @@ model User {
 
   payments Payment[]
 
+  attachments Attachment[]
+  comments    Comment[]
+
   @@map("users")
 }

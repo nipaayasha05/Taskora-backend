@@ -21,7 +21,10 @@ model Task {
 
   dueDate DateTime?
 
-  subTasks SubTask[]
+  subTasks    SubTask[]
+  attachments Attachment[]
+
+  comments Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
