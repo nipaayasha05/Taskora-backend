@@ -9,9 +9,6 @@ model Attachment {
 
   fileName String
   fileUrl  String
-  publicId String
-  fileType String
-  fileSize Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -17,6 +17,7 @@ import { taskRoutes } from "./app/module/task/task.route";
 import { subTaskRoutes } from "./app/module/subTask/subTask.route";
 import { paymentRoutes } from "./app/module/payment/payment.route";
 import { commentRoutes } from "./app/module/comment/comment.route";
+import { attachmentRoutes } from "./app/module/attachment/attachment.route";
 
 const app: Application = express();
 
@@ -44,7 +45,10 @@ app.use("/api/v1/organization/projects", projectRoutes);
 app.use("/api/v1/organization/projects/sprints", sprintRoutes);
 app.use("/api/v1/organization/projects/sprints/tasks", taskRoutes);
 app.use("/api/v1/organization/projects/sprints/tasks/subtasks", subTaskRoutes);
-// app.use("/api/v1/organization/projects/sprints/tasks/attachments", attachmentRoutes);
+app.use(
+  "/api/v1/organization/projects/sprints/tasks/attachments",
+  attachmentRoutes,
+);
 app.use("/api/v1/organization/projects/sprints/tasks/comments", commentRoutes);
 
 app.use("/api/v1/payments", paymentRoutes);
