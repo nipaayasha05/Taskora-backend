@@ -180,7 +180,7 @@ After approval, the organization creator becomes the organization owner.
 
 ---
 
-## 🔑 Authorization Flow
+## Authorization Flow
 
 For organization-level protected resources, Taskora verifies:
 
