@@ -12,21 +12,19 @@ export const globalErrorHandler = (
     console.log("Error -globalErrorHandler", err);
   }
 
-  let statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-  let errorMessage = err.message || "Internal Server Error";
-  let errorName = err.name || "Internal Server Error";
+  const statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+
+  const errorMessage = err.message || "Internal Server Error";
+
+  const errorName = err.name || "Internal Server Error";
 
   res.status(statusCode).json({
     success: false,
     statusCode,
-    name:
-      config.node_env === "development" ? errorName : "Internal Server Error",
-    message:
-      config.node_env === "development"
-        ? errorMessage
-        : "Internal Server Error",
-    error: config.node_env === "development" ? err : undefined,
-    stack: config.node_env === "development" ? err.stack : undefined,
+    name: errorName,
+    message: errorMessage,
+    error: err.message || null,
+    stack: err.stack || null,
     errorDetails: err.errorDetails || null,
     path: req.originalUrl,
   });

@@ -28,7 +28,7 @@ app.use(
   }),
 );
 
-const endpointSecret = config.stripe_webhook_secret;
+// const endpointSecret = config.stripe_webhook_secret;
 
 app.use("/api/v1/payments/confirm", express.raw({ type: "application/json" }));
 
