@@ -72,7 +72,21 @@ const profileUpdate = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const result = await profileService.getProfile(user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile retrieved successfully",
+    data: result,
+  });
+});
+
 export const profileController = {
   profileCreate,
   profileUpdate,
+  getProfile,
 };

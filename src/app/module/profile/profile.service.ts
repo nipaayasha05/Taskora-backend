@@ -3,6 +3,8 @@ import { IProfileCreatePayload } from "./profile.interface";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../middleware/checkAuth";
+import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const profileCreate = async (
   user: RequestUser,
@@ -166,7 +168,25 @@ const profileUpdate = async (
   return profileUpdate;
 };
 
+const getProfile = async (user: RequestUser) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const profile = await prisma.profile.findUnique({
+    where: {
+      userId: user.userId,
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  return profile;
+};
+
 export const profileService = {
   profileCreate,
   profileUpdate,
+  getProfile,
 };
