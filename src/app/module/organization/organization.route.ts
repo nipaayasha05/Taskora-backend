@@ -20,9 +20,15 @@ router.post(
 );
 
 router.get(
+  "/",
+  auth(SystemRole.ADMIN),
+  organizationController.getAllOrganization,
+);
+
+router.get(
   "/my-organization",
   auth(SystemRole.USER),
-  organizationController.getOrganization,
+  organizationController.getMyOrganization,
 );
 
 router.patch(

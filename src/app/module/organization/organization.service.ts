@@ -62,7 +62,7 @@ const createOrganization = async (
   return createOrganization;
 };
 
-const getOrganization = async (user: RequestUser) => {
+const getMyOrganization = async (user: RequestUser) => {
   if (!user.userId) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
   }
@@ -71,6 +71,18 @@ const getOrganization = async (user: RequestUser) => {
     where: {
       createdById: user.userId,
     },
+    include: {
+      createdBy: true,
+      members: true,
+      teams: true,
+      projects: true,
+    },
+  });
+  return result;
+};
+
+const getAllOrganization = async () => {
+  const result = await prisma.organization.findMany({
     include: {
       createdBy: true,
       members: true,
@@ -347,7 +359,8 @@ const updateOrganizationMember = async (
 
 export const organizationService = {
   createOrganization,
-  getOrganization,
+  getMyOrganization,
+  getAllOrganization,
   updateOrganization,
   joinOrganizationCreate,
   updateJoinOrganization,

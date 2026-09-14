@@ -28,10 +28,20 @@ const createOrganization = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getOrganization = catchAsync(async (req: Request, res: Response) => {
+const getMyOrganization = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
-  const result = await organizationService.getOrganization(user);
+  const result = await organizationService.getMyOrganization(user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Organization fetched successfully",
+    data: result,
+  });
+});
+
+const getAllOrganization = catchAsync(async (req: Request, res: Response) => {
+  const result = await organizationService.getAllOrganization();
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -131,7 +141,8 @@ const updateOrganizationMember = catchAsync(
 
 export const organizationController = {
   createOrganization,
-  getOrganization,
+  getMyOrganization,
+  getAllOrganization,
   updateOrganization,
   joinOrganizationCreate,
   updateJoinOrganization,
