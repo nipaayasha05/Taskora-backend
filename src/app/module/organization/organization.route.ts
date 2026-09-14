@@ -19,6 +19,12 @@ router.post(
   organizationController.createOrganization,
 );
 
+router.get(
+  "/my-organization",
+  auth(SystemRole.USER),
+  organizationController.getOrganization,
+);
+
 router.patch(
   "/:organizationId/status",
   auth(SystemRole.ADMIN),
