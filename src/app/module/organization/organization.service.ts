@@ -211,6 +211,45 @@ const joinOrganizationCreate = async (
   return joinRequst;
 };
 
+const getJoinOrganization = async (
+  user: RequestUser,
+  organizationId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (
+    member?.role !== OrganizationRole.OWNER &&
+    member?.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Only users with role OWNER or MANAGER can request to join organizations",
+    );
+  }
+
+  const result = await prisma.organizationJoinRequest.findMany({
+    where: {
+      organizationId,
+      status: OrganizationJoinRequestStatus.PENDING,
+    },
+    include: {
+      organization: true,
+    },
+  });
+  return result;
+};
+
 const updateJoinOrganization = async (
   user: RequestUser,
   organizationId: string,
@@ -363,6 +402,7 @@ export const organizationService = {
   getAllOrganization,
   updateOrganization,
   joinOrganizationCreate,
+  getJoinOrganization,
   updateJoinOrganization,
   updateOrganizationMember,
 };

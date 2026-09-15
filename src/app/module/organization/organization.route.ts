@@ -44,6 +44,12 @@ router.post(
   organizationController.joinOrganizationCreate,
 );
 
+router.get(
+  "/:organizationId/join",
+  auth(),
+  organizationController.getJoinOrganization,
+);
+
 router.patch(
   "/:organizationId/join",
   auth(),
