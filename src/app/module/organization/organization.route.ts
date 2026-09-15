@@ -57,6 +57,12 @@ router.patch(
   organizationController.updateJoinOrganization,
 );
 
+router.get(
+  "/:organizationId/join/my-join",
+  auth(),
+  organizationController.getMyJoinOrganization,
+);
+
 router.patch(
   "/:organizationId/members/:memberId",
   auth(),

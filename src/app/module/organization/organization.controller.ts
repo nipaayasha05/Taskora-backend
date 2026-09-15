@@ -132,6 +132,25 @@ const updateJoinOrganization = catchAsync(
   },
 );
 
+const getMyJoinOrganization = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user!;
+
+    const organizationId = req.params.organizationId;
+
+    const result = await organizationService.getMyJoinOrganization(
+      user,
+      organizationId as string,
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization fetched successfully",
+      data: result,
+    });
+  },
+);
+
 const updateOrganizationMember = catchAsync(
   async (req: Request, res: Response) => {
     const user = req.user;
@@ -164,5 +183,6 @@ export const organizationController = {
   joinOrganizationCreate,
   getJoinOrganization,
   updateJoinOrganization,
+  getMyJoinOrganization,
   updateOrganizationMember,
 };

@@ -333,6 +333,27 @@ const updateJoinOrganization = async (
   return result;
 };
 
+const getMyJoinOrganization = async (
+  user: RequestUser,
+  organizationId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const result = await prisma.organizationJoinRequest.findFirst({
+    where: {
+      organizationId,
+      invitedToId: user.userId,
+      status: OrganizationJoinRequestStatus.PENDING,
+    },
+    include: {
+      organization: true,
+    },
+  });
+  return result;
+};
+
 const updateOrganizationMember = async (
   user: RequestUser,
   organizationId: string,
@@ -403,6 +424,7 @@ export const organizationService = {
   updateOrganization,
   joinOrganizationCreate,
   getJoinOrganization,
+  getMyJoinOrganization,
   updateJoinOrganization,
   updateOrganizationMember,
 };
