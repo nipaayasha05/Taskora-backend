@@ -70,4 +70,10 @@ router.patch(
   organizationController.updateOrganizationMember,
 );
 
+router.get(
+  "/:organizationId/members/:memberId",
+  auth(),
+  organizationController.getOrganizationMember,
+);
+
 export const organizationRoutes = router;

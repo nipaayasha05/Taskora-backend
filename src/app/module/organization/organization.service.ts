@@ -417,6 +417,63 @@ const updateOrganizationMember = async (
   return result;
 };
 
+const getOrganizationMember = async (
+  user: RequestUser,
+  organizationId: string,
+  memberId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (!member) {
+    throw new AppError(httpStatus.NOT_FOUND, "Organization member not found");
+  }
+
+  if (
+    member.role === OrganizationRole.TEAM_MEMBER &&
+    member.userId !== memberId
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Only users with role TEAM_MEMBER can request to join organizations",
+    );
+  }
+
+  if (
+    member?.role !== OrganizationRole.OWNER &&
+    member?.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Only users with role OWNER or MANAGER can request to join organizations",
+    );
+  }
+
+  const result = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+    include: {
+      organization: true,
+      user: true,
+    },
+  });
+  return result;
+};
+
 export const organizationService = {
   createOrganization,
   getMyOrganization,
@@ -427,4 +484,5 @@ export const organizationService = {
   getMyJoinOrganization,
   updateJoinOrganization,
   updateOrganizationMember,
+  getOrganizationMember,
 };
