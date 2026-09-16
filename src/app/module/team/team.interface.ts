@@ -3,6 +3,11 @@ export interface ITeamCreate {
   description?: string;
 }
 
+export interface ITeamUpdate {
+  name?: string;
+  description?: string;
+}
+
 export interface ITeamMemberCreate {
   userIds: string[];
 }

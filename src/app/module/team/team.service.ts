@@ -2,7 +2,7 @@ import { OrganizationRole } from "../../../../prisma/generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
-import { ITeamCreate, ITeamMemberCreate } from "./team.interface";
+import { ITeamCreate, ITeamMemberCreate, ITeamUpdate } from "./team.interface";
 import httpStatus from "http-status";
 
 const createTeam = async (
@@ -57,6 +57,77 @@ const createTeam = async (
       ...payload,
       organizationId,
       createdById: user.userId,
+    },
+  });
+  return team;
+};
+
+const updateTeam = async (
+  user: RequestUser,
+  payload: ITeamUpdate,
+  organizationId: string,
+  teamId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only organization owner or manager can update a team",
+    );
+  }
+
+  const existingTeamInOrganization = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      organizationId,
+    },
+  });
+  if (!existingTeamInOrganization) {
+    throw new AppError(httpStatus.NOT_FOUND, "Team not found in organization");
+  }
+
+  if (payload.name) {
+    const duplicateTeam = await prisma.team.findFirst({
+      where: {
+        name: payload.name,
+        organizationId,
+        NOT: {
+          id: teamId,
+        },
+      },
+    });
+    if (duplicateTeam) {
+      throw new AppError(httpStatus.CONFLICT, "Team name already exists");
+    }
+  }
+
+  const team = await prisma.team.update({
+    where: {
+      id: teamId,
+    },
+    data: {
+      ...payload,
     },
   });
   return team;
@@ -153,5 +224,6 @@ const createTeamMember = async (
 
 export const teamService = {
   createTeam,
+  updateTeam,
   createTeamMember,
 };

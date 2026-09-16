@@ -14,6 +14,21 @@ export const teamCreateSchema = z.object({
     .optional(),
 });
 
+export const teamUpdateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Team name is required")
+    .max(100, "Team name cannot exceed 100 characters")
+    .optional(),
+
+  description: z
+    .string()
+    .trim()
+    .max(500, "Description cannot exceed 500 characters")
+    .optional(),
+});
+
 export const teamMemberCreateSchema = z.object({
   userIds: z.array(z.string().uuid("Invalid userId")),
 });
