@@ -21,6 +21,21 @@ const createTeam = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getTeamList = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+
+  const result = await teamService.getTeamList(user, organizationId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Team list fetched successfully",
+    data: result,
+  });
+});
+
 const updateTeam = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
@@ -71,6 +86,7 @@ const createTeamMember = catchAsync(async (req: Request, res: Response) => {
 
 export const teamController = {
   createTeam,
+  getTeamList,
   updateTeam,
   createTeamMember,
 };

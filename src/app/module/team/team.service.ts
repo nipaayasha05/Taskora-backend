@@ -62,6 +62,55 @@ const createTeam = async (
   return team;
 };
 
+const getTeamList = async (user: RequestUser, organizationId: string) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role === OrganizationRole.OWNER ||
+    member.role === OrganizationRole.MANAGER
+  ) {
+    return prisma.team.findMany({
+      where: {
+        organizationId,
+      },
+      include: {
+        members: true,
+      },
+    });
+  }
+
+  return prisma.team.findMany({
+    where: {
+      organizationId,
+      members: {
+        some: {
+          userId: user.userId,
+        },
+      },
+    },
+    include: {
+      members: true,
+    },
+  });
+};
+
 const updateTeam = async (
   user: RequestUser,
   payload: ITeamUpdate,
@@ -224,6 +273,7 @@ const createTeamMember = async (
 
 export const teamService = {
   createTeam,
+  getTeamList,
   updateTeam,
   createTeamMember,
 };

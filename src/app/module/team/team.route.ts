@@ -17,6 +17,8 @@ router.post(
   teamController.createTeam,
 );
 
+router.get("/:organizationId", auth(), teamController.getTeamList);
+
 router.patch(
   "/:organizationId/:teamId",
   auth(),
