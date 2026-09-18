@@ -253,17 +253,19 @@ const createTeamMember = async (
         in: userIds,
       },
     },
+    select: {
+      userId: true,
+    },
   });
 
-  if (existingMember.length > 0) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      "One or more team members already exist",
-    );
-  }
+  const existingUserIds = existingMember.map((member) => member.userId);
+
+  const userIdsToAdd = userIds.filter(
+    (userId) => !existingUserIds.includes(userId),
+  );
 
   const result = await prisma.teamMember.createMany({
-    data: userIds.map((userId) => ({
+    data: userIdsToAdd.map((userId) => ({
       teamId,
       userId,
     })),
@@ -271,9 +273,82 @@ const createTeamMember = async (
   return result;
 };
 
+const getTeamMemberList = async (
+  user: RequestUser,
+  organizationId: string,
+  teamId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      organizationId,
+    },
+  });
+
+  if (!team) {
+    throw new AppError(httpStatus.NOT_FOUND, "Team not found");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role === OrganizationRole.OWNER ||
+    member.role === OrganizationRole.MANAGER
+  ) {
+    return prisma.team.findUnique({
+      where: {
+        id: teamId,
+      },
+      include: {
+        members: true,
+      },
+    });
+  }
+
+  const isTeamMember = await prisma.teamMember.findFirst({
+    where: {
+      teamId,
+      userId: user.userId,
+    },
+  });
+  if (!isTeamMember) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only team members can view the team member list",
+    );
+  }
+
+  return prisma.team.findUnique({
+    where: {
+      id: teamId,
+    },
+    include: {
+      members: true,
+    },
+  });
+};
+
 export const teamService = {
   createTeam,
   getTeamList,
   updateTeam,
   createTeamMember,
+  getTeamMemberList,
 };

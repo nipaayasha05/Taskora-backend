@@ -33,4 +33,10 @@ router.post(
   teamController.createTeamMember,
 );
 
+router.get(
+  "/:organizationId/:teamId/members",
+  auth(),
+  teamController.getTeamMemberList,
+);
+
 export const teamRoutes = router;
