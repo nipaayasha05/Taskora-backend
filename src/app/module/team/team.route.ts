@@ -39,4 +39,10 @@ router.get(
   teamController.getTeamMemberList,
 );
 
+router.delete(
+  "/:organizationId/:teamId/members/:userId",
+  auth(),
+  teamController.removeTeamMember,
+);
+
 export const teamRoutes = router;

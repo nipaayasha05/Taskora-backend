@@ -345,10 +345,88 @@ const getTeamMemberList = async (
   });
 };
 
+const removeTeamMember = async (
+  user: RequestUser,
+  organizationId: string,
+  teamId: string,
+  userId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      organizationId,
+    },
+  });
+
+  if (!team) {
+    throw new AppError(httpStatus.NOT_FOUND, "Team not found");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (!member) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only organization owner or manager can remove a team member",
+    );
+  }
+
+  const existingMember = await prisma.teamMember.findUnique({
+    where: {
+      teamId_userId: {
+        teamId,
+        userId,
+      },
+    },
+  });
+
+  if (!existingMember) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User is not a member of this team",
+    );
+  }
+
+  await prisma.teamMember.delete({
+    where: {
+      teamId_userId: {
+        teamId,
+        userId,
+      },
+    },
+  });
+
+  return {
+    message: "Team member removed successfully",
+  };
+};
+
 export const teamService = {
   createTeam,
   getTeamList,
   updateTeam,
   createTeamMember,
   getTeamMemberList,
+  removeTeamMember,
 };

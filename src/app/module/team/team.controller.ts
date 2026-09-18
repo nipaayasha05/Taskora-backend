@@ -105,11 +105,35 @@ const getTeamMemberList = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const removeTeamMember = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const userId = req.params.userId as string;
+
+  const organizationId = req.params.organizationId as string;
+
+  const teamId = req.params.teamId as string;
+
+  const result = await teamService.removeTeamMember(
+    user,
+    organizationId,
+    teamId,
+    userId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Team member removed successfully",
+    data: result,
+  });
+});
+
 export const teamController = {
   createTeam,
   getTeamList,
   updateTeam,
   createTeamMember,
-
+  removeTeamMember,
   getTeamMemberList,
 };
