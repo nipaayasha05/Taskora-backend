@@ -25,6 +25,30 @@ const createProject = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateProject = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const payload = req.body;
+
+  const organizationId = req.params.organizationId as string;
+
+  const projectId = req.params.projectId as string;
+
+  const result = await projectService.updateProject(
+    user,
+    payload,
+    organizationId,
+    projectId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Project updated successfully",
+    data: result,
+  });
+});
+
 const createProjectTeams = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
@@ -70,6 +94,7 @@ const getProject = catchAsync(async (req: Request, res: Response) => {
 
 export const projectController = {
   createProject,
+  updateProject,
   createProjectTeams,
   getProject,
 };

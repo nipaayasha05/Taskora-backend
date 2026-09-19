@@ -6,6 +6,7 @@ import { projectController } from "./project.controller";
 import {
   projectCreateSchema,
   projectTeamCreateSchema,
+  projectUpdateSchema,
 } from "./project.validation";
 
 const router = Router();
@@ -15,6 +16,13 @@ router.post(
   auth(),
   validateRequest(projectCreateSchema),
   projectController.createProject,
+);
+
+router.patch(
+  "/:organizationId/:projectId",
+  auth(),
+  validateRequest(projectUpdateSchema),
+  projectController.updateProject,
 );
 
 router.post(

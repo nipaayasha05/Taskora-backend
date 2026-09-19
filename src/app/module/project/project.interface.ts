@@ -6,7 +6,16 @@ export interface IProjectCreate {
   status?: ProjectStatus;
   startDate?: Date;
   dueDate?: Date;
-  clientId:string
+  clientId: string;
+}
+
+export interface IUpdateProject {
+  name?: string;
+  description?: string;
+  status?: ProjectStatus;
+  startDate?: Date;
+  dueDate?: Date;
+  clientId: string;
 }
 
 export interface IProjectTeamCreate {

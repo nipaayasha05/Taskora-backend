@@ -2,7 +2,11 @@ import { OrganizationRole } from "../../../../prisma/generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { RequestUser } from "../../middleware/checkAuth";
 import { AppError } from "../../utils/AppError";
-import { IProjectCreate, IProjectTeamCreate } from "./project.interface";
+import {
+  IProjectCreate,
+  IProjectTeamCreate,
+  IUpdateProject,
+} from "./project.interface";
 import httpStatus from "http-status";
 
 const createProject = async (
@@ -80,6 +84,98 @@ const createProject = async (
       ...payload,
       organizationId,
       createdById: user.userId,
+    },
+  });
+  return project;
+};
+
+const updateProject = async (
+  user: RequestUser,
+  payload: IUpdateProject,
+  organizationId: string,
+  projectId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  if (
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER
+  ) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Only organization owner or manager can update a project",
+    );
+  }
+
+  const existingProject = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!existingProject) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  if (payload.name) {
+    const existingProject = await prisma.project.findFirst({
+      where: {
+        name: payload.name,
+        organizationId,
+        NOT: {
+          id: projectId,
+        },
+      },
+    });
+    if (existingProject) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Project already exists");
+    }
+  }
+
+  if (payload.startDate && payload.dueDate) {
+    if (new Date(payload.startDate) >= new Date(payload.dueDate)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Start date must be before due date",
+      );
+    }
+  }
+
+  if (payload.clientId) {
+    const client = await prisma.user.findUnique({
+      where: {
+        id: payload.clientId,
+      },
+    });
+    if (!client) {
+      throw new AppError(httpStatus.NOT_FOUND, "Client not found");
+    }
+  }
+
+  const project = await prisma.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      ...payload,
     },
   });
   return project;
@@ -214,6 +310,7 @@ const getProject = async (
 
 export const projectService = {
   createProject,
+  updateProject,
   createProjectTeams,
   getProject,
 };
