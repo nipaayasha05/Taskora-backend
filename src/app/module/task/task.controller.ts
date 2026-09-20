@@ -29,6 +29,52 @@ const createTask = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getTaskList = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+
+  const result = await taskService.getTaskList(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Task list retrieved successfully",
+    data: result,
+  });
+});
+
+const getTaskById = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+  const taskId = req.params.taskId as string;
+
+  const result = await taskService.getTaskById(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+    taskId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Task retrieved successfully",
+    data: result,
+  });
+});
+
 const updateTask = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
@@ -58,5 +104,7 @@ const updateTask = catchAsync(async (req: Request, res: Response) => {
 
 export const taskController = {
   createTask,
+  getTaskList,
+  getTaskById,
   updateTask,
 };

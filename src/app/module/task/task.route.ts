@@ -12,6 +12,18 @@ router.post(
   taskController.createTask,
 );
 
+router.get(
+  "/:organizationId/:projectId/:sprintId",
+  auth(),
+  taskController.getTaskList,
+);
+
+router.get(
+  "/:organizationId/:projectId/:sprintId/:taskId",
+  auth(),
+  taskController.getTaskById,
+);
+
 router.patch(
   "/:organizationId/:projectId/:sprintId/:taskId",
   auth(),

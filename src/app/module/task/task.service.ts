@@ -108,6 +108,158 @@ const createTask = async (
   return task;
 };
 
+const getTaskList = async (
+  user: RequestUser,
+  organizationId: string,
+  projectId: string,
+  sprintId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  const isTeamMember =
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER;
+
+  const result = await prisma.task.findMany({
+    where: {
+      sprintId,
+      projectId,
+      ...(isTeamMember
+        ? {
+            sprintTeam: {
+              some: {
+                team: {
+                  members: {
+                    some: {
+                      userId: user.userId,
+                    },
+                  },
+                },
+              },
+            },
+          }
+        : {}),
+    },
+    include: {
+      sprintTeam: {
+        include: {
+          team: true,
+        },
+      },
+      createdBy: true,
+      subTasks: true,
+      comments: true,
+      attachments: true,
+    },
+  });
+  return result;
+};
+
+const getTaskById = async (
+  user: RequestUser,
+  organizationId: string,
+  projectId: string,
+  sprintId: string,
+  taskId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  const isTeamMember =
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER;
+
+  const result = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      sprintId,
+      projectId,
+      ...(isTeamMember
+        ? {
+            sprintTeam: {
+              some: {
+                team: {
+                  members: {
+                    some: {
+                      userId: user.userId,
+                    },
+                  },
+                },
+              },
+            },
+          }
+        : {}),
+    },
+    include: {
+      sprintTeam: {
+        include: {
+          team: true,
+        },
+      },
+      createdBy: true,
+      subTasks: true,
+      comments: true,
+      attachments: true,
+    },
+  });
+  return result;
+};
+
 const updateTask = async (
   user: RequestUser,
   payload: ITaskUpdate,
@@ -223,5 +375,7 @@ const updateTask = async (
 
 export const taskService = {
   createTask,
+  getTaskList,
+  getTaskById,
   updateTask,
 };
