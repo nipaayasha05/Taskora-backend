@@ -17,6 +17,12 @@ router.post(
   sprintController.createSprint,
 );
 
+router.get(
+  "/:organizationId/:projectId",
+  auth(),
+  sprintController.getAllProjectSprints,
+);
+
 router.patch(
   "/:organizationId/:projectId/:sprintId",
   auth(),

@@ -91,6 +91,43 @@ const createSprint = async (
   return sprint;
 };
 
+const getAllProjectSprints = async (
+  user: RequestUser,
+  organizationId: string,
+  projectId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  const result = await prisma.sprint.findMany({
+    where: {
+      projectId,
+    },
+    include: {
+      sprintTeams: {
+        include: {
+          team: true,
+        },
+      },
+      tasks: true,
+      payments: true,
+    },
+  });
+  return result;
+};
+
 const updateSprint = async (
   user: RequestUser,
   payload: ISprintUpdate,
@@ -290,6 +327,7 @@ const createSprintTeam = async (
 
 export const sprintService = {
   createSprint,
+  getAllProjectSprints,
   updateSprint,
   createSprintTeam,
 };
