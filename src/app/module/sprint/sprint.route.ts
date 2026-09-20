@@ -23,6 +23,12 @@ router.get(
   sprintController.getAllProjectSprints,
 );
 
+router.get(
+  "/:organizationId/:projectId/:sprintId",
+  auth(),
+  sprintController.getSprintById,
+);
+
 router.patch(
   "/:organizationId/:projectId/:sprintId",
   auth(),

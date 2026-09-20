@@ -47,6 +47,28 @@ const getAllProjectSprints = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSprintById = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+
+  const result = await sprintService.getSprintById(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Sprint retrieved successfully",
+    data: result,
+  });
+});
+
 const updateSprint = catchAsync(async (req: Request, res: Response) => {
   const user = req.user!;
 
@@ -100,6 +122,7 @@ const createSprintTeam = catchAsync(async (req: Request, res: Response) => {
 export const sprintController = {
   createSprint,
   getAllProjectSprints,
+  getSprintById,
   createSprintTeam,
   updateSprint,
 };
