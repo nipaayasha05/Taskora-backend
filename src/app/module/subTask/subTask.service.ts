@@ -76,6 +76,97 @@ const createSubTask = async (
   return subTask;
 };
 
+const getSubTask = async (
+  user: RequestUser,
+  organizationId: string,
+  projectId: string,
+  sprintId: string,
+  taskId: string,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+  if (!member) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "User is not a member of the organization",
+    );
+  }
+
+  const isTeamMember =
+    member.role !== OrganizationRole.OWNER &&
+    member.role !== OrganizationRole.MANAGER;
+
+  const task = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      projectId,
+      sprintId,
+    },
+  });
+
+  if (!task) {
+    throw new AppError(httpStatus.NOT_FOUND, "Task not found");
+  }
+
+  if (isTeamMember) {
+    const sprintTeam = await prisma.sprintTeam.findFirst({
+      where: {
+        id: task.sprintTeamId,
+      },
+      include: {
+        team: {
+          include: {
+            members: true,
+          },
+        },
+      },
+    });
+
+    const isMemberOfTeam = sprintTeam?.team.members.some(
+      (teamMember) => teamMember.userId === user.userId,
+    );
+    if (!isMemberOfTeam) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "User is not a member of the team",
+      );
+    }
+  }
+
+  const result = await prisma.subTask.findMany({
+    where: {
+      taskId,
+    },
+    include: {
+      task: true,
+    },
+  });
+
+  return result;
+};
+
 export const subTaskService = {
   createSubTask,
+  getSubTask,
 };

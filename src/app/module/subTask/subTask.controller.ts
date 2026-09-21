@@ -31,6 +31,31 @@ const createSubTask = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSubTask = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+  const taskId = req.params.taskId as string;
+
+  const result = await subTaskService.getSubTask(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+    taskId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "SubTask retrieved successfully",
+    data: result,
+  });
+});
+
 export const subTaskController = {
   createSubTask,
+  getSubTask,
 };

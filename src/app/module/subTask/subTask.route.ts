@@ -13,4 +13,10 @@ router.post(
   subTaskController.createSubTask,
 );
 
+router.get(
+  "/:organizationId/:projectId/:sprintId/:taskId",
+  auth(),
+  subTaskController.getSubTask,
+);
+
 export const subTaskRoutes = router;
