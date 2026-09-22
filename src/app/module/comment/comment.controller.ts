@@ -31,6 +31,31 @@ const createComment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getComment = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+  const taskId = req.params.taskId as string;
+
+  const result = await commentService.getComment(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+    taskId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Comment retrieved successfully",
+    data: result,
+  });
+});
+
 export const commentController = {
   createComment,
+  getComment,
 };

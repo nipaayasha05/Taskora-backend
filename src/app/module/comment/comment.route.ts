@@ -13,4 +13,10 @@ router.post(
   commentController.createComment,
 );
 
+router.get(
+  "/:organizationId/:projectId/:sprintId/:taskId",
+  auth(),
+  commentController.getComment,
+);
+
 export const commentRoutes = router;
