@@ -15,4 +15,10 @@ router.post(
   attachmentController.createAttachment,
 );
 
+router.get(
+  "/:organizationId/:projectId/:sprintId/:taskId",
+  auth(),
+  attachmentController.getAttachment,
+);
+
 export const attachmentRoutes = router;

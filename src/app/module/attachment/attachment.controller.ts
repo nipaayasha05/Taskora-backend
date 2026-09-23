@@ -37,6 +37,33 @@ const createAttachment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAttachment = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  //   const payload = req.body;
+
+  const organizationId = req.params.organizationId as string;
+  const projectId = req.params.projectId as string;
+  const sprintId = req.params.sprintId as string;
+  const taskId = req.params.taskId as string;
+
+  const result = await attachmentService.getAttachment(
+    user,
+    organizationId,
+    projectId,
+    sprintId,
+    taskId,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Attachment fetched successfully",
+    data: result,
+  });
+});
+
 export const attachmentController = {
   createAttachment,
+  getAttachment,
 };
