@@ -16,6 +16,7 @@ import {
   OrganizationRole,
   OrganizationStatus,
 } from "../../../../prisma/generated/prisma/enums";
+import { get } from "node:http";
 
 const createOrganization = async (
   user: RequestUser,
@@ -88,6 +89,48 @@ const getAllOrganization = async () => {
       members: true,
       teams: true,
       projects: true,
+    },
+  });
+  return result;
+};
+
+const getAllOrganizationPublic = async () => {
+  const result = await prisma.organization.findMany({
+    where: {
+      status: "APPROVED",
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      logo: true,
+
+      members: {
+        where: {
+          role: {
+            in: ["OWNER", "MANAGER"],
+          },
+        },
+        select: {
+          role: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+              profile: {
+                select: {
+                  contactNumber: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          projects: true,
+        },
+      },
     },
   });
   return result;
@@ -485,4 +528,5 @@ export const organizationService = {
   updateJoinOrganization,
   updateOrganizationMember,
   getOrganizationMember,
+  getAllOrganizationPublic,
 };

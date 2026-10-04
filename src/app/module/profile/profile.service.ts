@@ -173,12 +173,14 @@ const getProfile = async (user: RequestUser) => {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
   }
 
-  const profile = await prisma.profile.findUnique({
+  const profile = await prisma.user.findUnique({
     where: {
-      userId: user.userId,
+      id: user.userId,
     },
     include: {
-      user: true,
+      profile: true,
+      createdOrganizations: true,
+      organizationMembers: true,
     },
   });
 

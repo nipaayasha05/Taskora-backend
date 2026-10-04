@@ -25,6 +25,8 @@ router.get(
   organizationController.getAllOrganization,
 );
 
+router.get("/public", organizationController.getAllOrganizationPublic);
+
 router.get(
   "/my-organization",
   auth(SystemRole.USER),

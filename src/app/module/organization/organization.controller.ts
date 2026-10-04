@@ -50,6 +50,18 @@ const getAllOrganization = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllOrganizationPublic = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await organizationService.getAllOrganizationPublic();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization fetched successfully (public)",
+      data: result,
+    });
+  },
+);
+
 const updateOrganization = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const organizationId = req.params.organizationId;
@@ -207,4 +219,5 @@ export const organizationController = {
   getMyJoinOrganization,
   updateOrganizationMember,
   getOrganizationMember,
+  getAllOrganizationPublic,
 };

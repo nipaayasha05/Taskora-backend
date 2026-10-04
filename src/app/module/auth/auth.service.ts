@@ -449,10 +449,42 @@ const refreshToken = async (token: string) => {
   };
 };
 
+const getUsers = async (search?: string) => {
+  const result = await prisma.user.findMany({
+    where: search
+      ? {
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : undefined,
+
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    take: 10,
+  });
+  return result;
+};
+
 export const authService = {
   registerUser,
   verifyUserEmail,
   loginUser,
   googleLogin,
   refreshToken,
+  getUsers,
 };
