@@ -60,7 +60,8 @@ router.patch(
 );
 
 router.get(
-  "/:organizationId/join/my-join",
+  // "/:organizationId/join/my-join",
+  "/join/my-join",
   auth(),
   organizationController.getMyJoinOrganization,
 );
@@ -73,9 +74,15 @@ router.patch(
 );
 
 router.get(
-  "/:organizationId/members/:memberId",
+  "/:organizationId/members",
   auth(),
   organizationController.getOrganizationMember,
+);
+
+router.get(
+  "/overview/:organizationId",
+  auth(),
+  organizationController.getOrganizationOverview,
 );
 
 export const organizationRoutes = router;

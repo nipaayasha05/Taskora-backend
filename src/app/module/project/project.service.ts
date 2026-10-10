@@ -308,9 +308,70 @@ const getProject = async (
   return result;
 };
 
+const getAllProject = async (user: RequestUser, organizationId: string) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const result = await prisma.project.findMany({
+    where: {
+      organizationId,
+    },
+    include: {
+      client: true,
+      projectTeams: {
+        include: {
+          team: true,
+        },
+      },
+      sprints: {
+        include: {
+          sprintTeams: {
+            include: {
+              team: true,
+            },
+          },
+        },
+      },
+      tasks: {
+        include: {
+          subTasks: true,
+        },
+      },
+    },
+  });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Project not found");
+  }
+  return result;
+};
+
+export const getMyProjects = async (user: RequestUser) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const result = await prisma.project.findMany({
+    where: {
+      clientId: user.userId,
+    },
+    include: {
+      sprints: {
+        include: {
+          tasks: true,
+          payments: true,
+        },
+      },
+    },
+  });
+  return result;
+};
+
 export const projectService = {
   createProject,
   updateProject,
   createProjectTeams,
   getProject,
+  getAllProject,
+  getMyProjects,
 };

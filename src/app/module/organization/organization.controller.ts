@@ -208,6 +208,25 @@ const getOrganizationMember = catchAsync(
   },
 );
 
+const getOrganizationOverview = catchAsync(
+  async (req: Request, res: Response) => {
+    const { organizationId } = req.params;
+    const user = req.user;
+
+    const result = await organizationService.getOrganizationOverview(
+      organizationId as string,
+      user as RequestUser,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Organization overview retrieved successfully",
+      data: result,
+    });
+  },
+);
+
 export const organizationController = {
   createOrganization,
   getMyOrganization,
@@ -220,4 +239,5 @@ export const organizationController = {
   updateOrganizationMember,
   getOrganizationMember,
   getAllOrganizationPublic,
+  getOrganizationOverview,
 };

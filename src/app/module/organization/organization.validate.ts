@@ -22,7 +22,7 @@ export const createOrganizationSchema = z.object({
 export const organizationJoinSchema = z.object({
   invitedToId: z.string().uuid("Invalid invitedToId"),
 
-  invitedById: z.string().uuid("Invalid invitedById"),
+  // invitedById: z.string().uuid("Invalid invitedById"),
 });
 
 export const organizationJoinUpdateSchema = z.object({

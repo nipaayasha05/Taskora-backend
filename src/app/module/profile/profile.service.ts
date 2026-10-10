@@ -180,7 +180,17 @@ const getProfile = async (user: RequestUser) => {
     include: {
       profile: true,
       createdOrganizations: true,
-      organizationMembers: true,
+      organizationMembers: {
+        include: {
+          organization: true,
+        },
+      },
+
+      invitedTo: {
+        include: {
+          organization: true,
+        },
+      },
     },
   });
 

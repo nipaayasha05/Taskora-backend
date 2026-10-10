@@ -237,6 +237,10 @@ const joinOrganizationCreate = async (
     },
   });
 
+  console.log("organizationId:", organizationId);
+  console.log("invitedToId:", payload.invitedToId);
+  console.log("existingRequest:", existingRequest);
+
   if (existingRequest) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -288,6 +292,7 @@ const getJoinOrganization = async (
     },
     include: {
       organization: true,
+      invitedTo: true,
     },
   });
   return result;
@@ -384,14 +389,15 @@ const getMyJoinOrganization = async (
     throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
   }
 
-  const result = await prisma.organizationJoinRequest.findFirst({
+  const result = await prisma.organizationJoinRequest.findMany({
     where: {
-      organizationId,
+      // organizationId,
       invitedToId: user.userId,
       status: OrganizationJoinRequestStatus.PENDING,
     },
     include: {
       organization: true,
+      invitedBy: true,
     },
   });
   return result;
@@ -502,12 +508,9 @@ const getOrganizationMember = async (
     );
   }
 
-  const result = await prisma.organizationMember.findUnique({
+  const result = await prisma.organizationMember.findMany({
     where: {
-      organizationId_userId: {
-        organizationId,
-        userId: user.userId,
-      },
+      organizationId,
     },
     include: {
       organization: true,
@@ -515,6 +518,301 @@ const getOrganizationMember = async (
     },
   });
   return result;
+};
+
+const getOrganizationOverview = async (
+  organizationId: string,
+  user: RequestUser,
+) => {
+  if (!user.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not logged in");
+  }
+
+  const member = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId,
+        userId: user.userId,
+      },
+    },
+  });
+
+  if (!member) {
+    throw new AppError(httpStatus.NOT_FOUND, "Organization member not found");
+  }
+
+  const [
+    totalMembers,
+    totalTeams,
+    totalProjects,
+    totalSprints,
+    totalTasks,
+
+    activeProjects,
+    completedProjects,
+
+    activeSprints,
+
+    pendingJoinRequests,
+
+    totalPayments,
+    successfulPayments,
+    pendingPayments,
+
+    recentProjects,
+    recentSprints,
+    recentMembers,
+    recentPayments,
+  ] = await Promise.all([
+    prisma.organizationMember.count({
+      where: {
+        organizationId,
+      },
+    }),
+
+    prisma.team.count({
+      where: {
+        organizationId,
+      },
+    }),
+
+    prisma.project.count({
+      where: {
+        organizationId,
+      },
+    }),
+
+    prisma.sprint.count({
+      where: {
+        project: {
+          organizationId,
+        },
+      },
+    }),
+
+    prisma.task.count({
+      where: {
+        project: {
+          organizationId,
+        },
+      },
+    }),
+
+    prisma.project.count({
+      where: {
+        organizationId,
+        status: "ACTIVE",
+      },
+    }),
+
+    prisma.project.count({
+      where: {
+        organizationId,
+        status: "COMPLETED",
+      },
+    }),
+
+    prisma.sprint.count({
+      where: {
+        project: {
+          organizationId,
+        },
+        status: "ACTIVE",
+      },
+    }),
+
+    prisma.organizationJoinRequest.count({
+      where: {
+        organizationId,
+        status: "PENDING",
+      },
+    }),
+
+    prisma.payment.count({
+      where: {
+        sprint: {
+          project: {
+            organizationId,
+          },
+        },
+      },
+    }),
+
+    prisma.payment.count({
+      where: {
+        status: "SUCCESS",
+        sprint: {
+          project: {
+            organizationId,
+          },
+        },
+      },
+    }),
+
+    prisma.payment.count({
+      where: {
+        status: "PENDING",
+        sprint: {
+          project: {
+            organizationId,
+          },
+        },
+      },
+    }),
+
+    prisma.project.findMany({
+      where: {
+        organizationId,
+      },
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        startDate: true,
+        dueDate: true,
+        createdAt: true,
+
+        client: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+    }),
+
+    prisma.sprint.findMany({
+      where: {
+        project: {
+          organizationId,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        goal: true,
+        status: true,
+        paymentAmount: true,
+        startDate: true,
+        endDate: true,
+        createdAt: true,
+
+        project: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+    }),
+
+    prisma.organizationMember.findMany({
+      where: {
+        organizationId,
+      },
+      select: {
+        id: true,
+        role: true,
+        createdAt: true,
+
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile: {
+              select: {
+                avatar: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+    }),
+
+    prisma.payment.findMany({
+      where: {
+        sprint: {
+          project: {
+            organizationId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        transactionId: true,
+        paidAt: true,
+        createdAt: true,
+
+        client: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+
+        sprint: {
+          select: {
+            id: true,
+            name: true,
+
+            project: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+    }),
+  ]);
+  return {
+    summary: {
+      members: totalMembers,
+      teams: totalTeams,
+      projects: totalProjects,
+      sprints: totalSprints,
+      tasks: totalTasks,
+      activeProjects,
+      completedProjects,
+
+      activeSprints,
+
+      pendingJoinRequests,
+      payments: {
+        total: totalPayments,
+        successful: successfulPayments,
+        pending: pendingPayments,
+      },
+    },
+    recent: {
+      projects: recentProjects,
+      sprints: recentSprints,
+      members: recentMembers,
+      payments: recentPayments,
+    },
+  };
 };
 
 export const organizationService = {
@@ -529,4 +827,5 @@ export const organizationService = {
   updateOrganizationMember,
   getOrganizationMember,
   getAllOrganizationPublic,
+  getOrganizationOverview,
 };

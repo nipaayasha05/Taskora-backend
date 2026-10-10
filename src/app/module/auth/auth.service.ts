@@ -24,6 +24,7 @@ import {
   UserStatus,
 } from "../../../../prisma/generated/prisma/enums";
 import { is } from "zod/locales";
+import { RequestUser } from "../../middleware/checkAuth";
 
 const registerUser = async (payload: IRegisterUserPayload) => {
   const { name, password } = payload;

@@ -18,6 +18,7 @@ import { subTaskRoutes } from "./app/module/subTask/subTask.route";
 import { paymentRoutes } from "./app/module/payment/payment.route";
 import { commentRoutes } from "./app/module/comment/comment.route";
 import { attachmentRoutes } from "./app/module/attachment/attachment.route";
+import { userRoutes } from "./app/module/user/user.route";
 
 const app: Application = express();
 
@@ -52,6 +53,7 @@ app.use(
 app.use("/api/v1/organization/projects/sprints/tasks/comments", commentRoutes);
 
 app.use("/api/v1/payments", paymentRoutes);
+app.use("/api/v1/user-management", userRoutes);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({

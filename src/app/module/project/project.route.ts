@@ -25,6 +25,8 @@ router.patch(
   projectController.updateProject,
 );
 
+router.get("/my-projects", auth(), projectController.getMyProjects);
+
 router.post(
   "/:organizationId/:projectId",
   auth(),
@@ -33,5 +35,6 @@ router.post(
 );
 
 router.get("/:organizationId/:projectId", auth(), projectController.getProject);
+router.get("/:organizationId", auth(), projectController.getAllProject);
 
 export const projectRoutes = router;
