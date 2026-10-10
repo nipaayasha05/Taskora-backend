@@ -121,12 +121,13 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/v1/auth/login",
-              "protocol": "http",
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/auth/login",
+              "protocol": "https",
               "host": [
-                "localhost"
+                "taskora-backend-azure",
+                "vercel",
+                "app"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "v1",
@@ -269,6 +270,29 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "get_profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/users/profile",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -314,7 +338,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"status\": \"APPROVED\"\r\n}",
+              "raw": "{\r\n  \"status\": \"APPROVED\"\r\n} ",
               "options": {
                 "raw": {
                   "language": "json"
@@ -322,7 +346,7 @@
               }
             },
             "url": {
-              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/status",
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations/977ded2e-2fba-44d0-83b8-38d365fd8bb0/status",
               "protocol": "https",
               "host": [
                 "taskora-backend-azure",
@@ -333,7 +357,7 @@
                 "api",
                 "v1",
                 "organizations",
-                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "977ded2e-2fba-44d0-83b8-38d365fd8bb0",
                 "status"
               ]
             }
@@ -439,6 +463,102 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "get_organization_for_owner",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations/my-organization",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organizations",
+                "my-organization"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_all_organization",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organizations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_join_request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/join",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organizations",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "join"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_my_join_request",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get_member_role",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get_organization_public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -485,7 +605,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"userIds\":[\r\n        \"bd828f57-7058-4d97-88ab-d203502db7e0\"\r\n       \r\n    ]\r\n}",
+              "raw": "{\r\n    \"userIds\":[\r\n        \"bd828f57-7058-4d97-88ab-d203502db7e0\",\r\n        \"fbd372e1-cff7-44f5-bd51-39a9805fa255\"\r\n       \r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -508,6 +628,126 @@
                 "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
                 "d856d12c-480f-48b8-ba4b-9769e13db6a5",
                 "members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update_team",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"name\": \"UI/UX Design Team\",\r\n    \"description\": \"Team responsible for UI/UX design and user experience.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/teams/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/d856d12c-480f-48b8-ba4b-9769e13db6a5",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "teams",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "d856d12c-480f-48b8-ba4b-9769e13db6a5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_team",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/teams/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "teams",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_team_members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/teams/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/d856d12c-480f-48b8-ba4b-9769e13db6a5/members",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "teams",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "d856d12c-480f-48b8-ba4b-9769e13db6a5",
+                "members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "remove_team_member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/teams/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/d856d12c-480f-48b8-ba4b-9769e13db6a5/members/fbd372e1-cff7-44f5-bd51-39a9805fa255",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "teams",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "d856d12c-480f-48b8-ba4b-9769e13db6a5",
+                "members",
+                "fbd372e1-cff7-44f5-bd51-39a9805fa255"
               ]
             }
           },
@@ -605,6 +845,88 @@
                 "projects",
                 "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
                 "6111eddc-c4a8-454f-8a18-0ac0fc27b944"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update_project",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"E-commerce website\"\r\n \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_all_project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_my_project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/my-projects",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "my-projects"
               ]
             }
           },
@@ -721,6 +1043,59 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "get_all_project_sprints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ge_sprint_by_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944/e0b6ba07-ca10-4251-8143-b3d31a47d930",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+                "e0b6ba07-ca10-4251-8143-b3d31a47d930"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -801,6 +1176,63 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "get_task",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/tasks/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944/e0b6ba07-ca10-4251-8143-b3d31a47d930",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "tasks",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+                "e0b6ba07-ca10-4251-8143-b3d31a47d930"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_task_by_id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/tasks/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944/e0b6ba07-ca10-4251-8143-b3d31a47d930/d913c624-380f-410f-a2fd-aa25ba3b375e",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "tasks",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+                "e0b6ba07-ca10-4251-8143-b3d31a47d930",
+                "d913c624-380f-410f-a2fd-aa25ba3b375e"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -841,6 +1273,36 @@
                 "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
                 "e0b6ba07-ca10-4251-8143-b3d31a47d930",
                 "d913c624-380f-410f-a2fd-aa25ba3b375e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_subtask",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/tasks/subtasks/78d92c00-bcb8-4281-8b00-3f66c8ad3651/d451401f-285d-4276-aff1-3b776891f490/0fff3980-77f6-48cf-8ed9-c477a563f0eb/0d2d6826-b414-4f41-bac9-c5a3f8b3989b",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "tasks",
+                "subtasks",
+                "78d92c00-bcb8-4281-8b00-3f66c8ad3651",
+                "d451401f-285d-4276-aff1-3b776891f490",
+                "0fff3980-77f6-48cf-8ed9-c477a563f0eb",
+                "0d2d6826-b414-4f41-bac9-c5a3f8b3989b"
               ]
             }
           },
@@ -925,6 +1387,36 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "get_comment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/tasks/comments/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944/e0b6ba07-ca10-4251-8143-b3d31a47d930/d913c624-380f-410f-a2fd-aa25ba3b375e",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "tasks",
+                "comments",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+                "e0b6ba07-ca10-4251-8143-b3d31a47d930",
+                "d913c624-380f-410f-a2fd-aa25ba3b375e"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -973,6 +1465,142 @@
                 "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
                 "e0b6ba07-ca10-4251-8143-b3d31a47d930",
                 "d913c624-380f-410f-a2fd-aa25ba3b375e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get_attachment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organization/projects/sprints/tasks/attachments/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f/6111eddc-c4a8-454f-8a18-0ac0fc27b944/e0b6ba07-ca10-4251-8143-b3d31a47d930/d913c624-380f-410f-a2fd-aa25ba3b375e",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organization",
+                "projects",
+                "sprints",
+                "tasks",
+                "attachments",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+                "6111eddc-c4a8-454f-8a18-0ac0fc27b944",
+                "e0b6ba07-ca10-4251-8143-b3d31a47d930",
+                "d913c624-380f-410f-a2fd-aa25ba3b375e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "get_all_user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/auth/users?search=nipa",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "nipa"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "user_overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/user-management/user/overview",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-management",
+                "user",
+                "overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "admin_overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/user-management/admin/overview",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user-management",
+                "admin",
+                "overview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "organization_overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://taskora-backend-azure.vercel.app/api/v1/organizations/overview/54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f",
+              "protocol": "https",
+              "host": [
+                "taskora-backend-azure",
+                "vercel",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organizations",
+                "overview",
+                "54cf76d1-bce0-4c7a-b9e9-ba54d2facc5f"
               ]
             }
           },
